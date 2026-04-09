@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: employeedb
+      POSTGRES_USER: empuser
+      # Vulnerabilidad existente: contraseña en texto plano
+      POSTGRES_PASSWORD: emppass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: db
+      DB_NAME: employeedb
+      DB_USER: empuser
+      DB_PASSWORD: emppass
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      
+volumes:
+  postgres_data:
